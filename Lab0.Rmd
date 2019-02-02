@@ -1,0 +1,305 @@
+---
+title: "Lab 0"
+author: "Priya Shaji"
+date: "February 1, 2019"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Analyzing Arbuthnot's dataset using basic R commands
+
+Load the dataset
+```{r}
+source("more/arbuthnot.R")
+```
+
+View the dataset
+```{r}
+arbuthnot
+
+```
+
+Dimensions of the dataset
+```{r}
+dim(arbuthnot)
+
+```
+
+Names of columns of the Arbuthnot Dataset
+```{r}
+names(arbuthnot)
+
+```
+
+##  Number of boys baptized each year
+```{r}
+arbuthnot$boys
+
+```
+## EXERCISE 1
+What command would you use to extract just the counts of girls baptized?
+
+Answer 1:
+```{r}
+arbuthnot$girls
+
+```
+## Create a simple plot of the number of girls baptized per year with the command
+```{r}
+plot(x = arbuthnot$year, y = arbuthnot$girls)
+
+```
+
+
+
+The first argument in the plot function specifies the variable for the x-axis and the second for the y-axis. If we wanted to connect the data points with lines, we could add a third argument, the letter l for line.
+```{r}
+plot(x = arbuthnot$year, y = arbuthnot$girls, type = "l")
+
+```
+
+
+
+
+## EXERCISE 2
+Is there an apparent trend in the number of girls baptized over the years?
+How would you describe it?
+
+ANSWER 2: By analyzing the plot which shows the number of girls born each year,
+there is a gradual increase in the count of girls born from yea 1660 to 1700
+
+## Add the vector for baptisms for boys and girls
+```{r}
+arbuthnot$boys + arbuthnot$girls
+
+```
+
+## Plot of the total number of baptisms per year with the command
+```{r}
+plot(arbuthnot$year, arbuthnot$boys + arbuthnot$girls, type = "l")
+```
+
+
+
+## The proportion of newborns that are boys
+```{r}
+arbuthnot$boys / (arbuthnot$boys + arbuthnot$girls)
+```
+## EXERCISE 3
+Answer 3:
+
+plot of the proportion of boys over time
+create a regression line to analyze the proportion over time
+```{r}
+plot(arbuthnot$boys / (arbuthnot$boys + arbuthnot$girls)~arbuthnot$year, type = "l",data=arbuthnot)
+abline(lm(arbuthnot$boys / (arbuthnot$boys + arbuthnot$girls) ~ arbuthnot$year,data=arbuthnot))
+
+```
+ 
+ 
+ 
+ plot of the proportion of girls over time
+ create a regression line to analyze the proportion over time
+```{r}
+plot(arbuthnot$girls / (arbuthnot$boys + arbuthnot$girls)~arbuthnot$year, type = "l")
+abline(lm(arbuthnot$girls / (arbuthnot$boys + arbuthnot$girls) ~ arbuthnot$year))
+
+```
+
+
+
+We infer that, the regression line of proportion of boys over time decreases over the years and is above 0.5
+and the regression line of proportion of girls over time increases over years and is below 0.5. Therefore, the number of boys increases over the years as compared to number of girls.
+  
+## Do boys outnumber girls in each year
+```{r}
+arbuthnot$boys > arbuthnot$girls
+## yes
+
+```
+## On Your Own
+
+## Analyzing present day birth records dataset in United States using basic R commands
+
+1) Load the dataset
+```{r}
+source("more/present.R")
+
+```
+
+2) View the dataset
+```{r}
+present
+
+```
+
+3)Dimensions of the dataset
+```{r}
+dim(present)
+
+```
+
+4)Names of columns of the present Dataset
+```{r}
+names(present)
+
+```
+
+##  Number of boys born each year
+```{r}
+present$boys
+
+```
+## EXERCISE 1
+What command would you use to extract just the counts of girls born?
+
+Answer 1:
+```{r}
+present$girls
+
+```
+## Create a simple plot of the number of girls born per year with the command
+```{r}
+plot(x = present$year, y = present$girls)
+
+```
+
+
+
+The first argument in the plot function specifies the variable for the x-axis and the second for the y-axis. If we wanted to connect the data points with lines, we could add a third argument, the letter l for line.
+```{r}
+plot(x = present$year, y = present$girls, type = "l")
+
+```
+
+
+
+## EXERCISE 2
+
+Is there an apparent trend in the number of girls baptized over the years?
+How would you describe it?
+
+ANSWER 2: By analyzing the plot which shows the number of girls born each year,
+there is a gradual increase in the count of girls born from yea 1660 to 1700
+
+## Add the vector for birth for boys and girls
+```{r}
+present$boys + present$girls
+
+```
+## Plot of the total number of births per year with the command
+```{r}
+plot(present$year, present$boys + present$girls, type = "l")
+
+```
+
+
+
+## The proportion of newborns that are boys
+```{r}
+present$boys / (present$boys + present$girls)
+```
+## EXERCISE 3
+
+Answer 3:
+plot of the proportion of boys over time
+create a regression line to analyze the proportion over time
+```{r}
+plot( present$boys / (present$boys + present$girls)~present$year, type = "l")
+abline(lm(present$boys / (present$boys + present$girls) ~ present$year))
+
+```
+
+
+
+plot of the proportion of girls over time
+create a regression line to analyze the proportion over time
+```{r}
+plot(present$girls / (present$boys + present$girls)~present$year, type = "l")
+abline(lm(present$girls / (present$boys + present$girls) ~ present$year))
+
+```
+
+
+
+We infer that, the regression line of proportion of boys over time decreases over the years and is above 0.5
+and the regression line of proportion of girls over time increases over years and is below 0.5. Therefore, the number of boys increases over the years as compared to number of girls.
+  
+## Do boys outnumber girls in each year ?
+```{r}
+present$boys > present$girls
+## yes
+```
+## Questions
+1) What years are included in this data set? What are the dimensions of the data frame and what are the variable or column names?
+```{r}
+head(present)
+tail(present)
+dim(present)
+names(present)
+
+```
+
+
+
+Answer 1) The years included in this dataset are:
+1940 to 2002
+
+2) How do these counts compare to Arbuthnot's? Are they on a similar scale?
+
+Answer2) Arbuthnot and present datasets are similar for the following cases:  
+Both have same no. of columns and same column names
+Both datasets are analyzing the birth of boys and girls over time.
+
+Arbuthnot and present datasets differ in their counts:
+When we calculate the mean their is a difference in the counts of both the datasets.
+
+arbuthnot's mean 
+```{r}
+mean(arbuthnot$boys + arbuthnot$girls)
+```
+
+present's mean
+```{r}
+mean(present$boys + present$girls)
+```
+
+3) Make a plot that displays the boy-to-girl ratio for every year in the data set. What do you see? Does Arbuthnot's observation about boys being born in greater proportion than girls hold up in the U.S.? Include the plot in your response.
+
+Answer 3)
+```{r}
+plot(present$year, present$boys / (present$boys + present$girls), type = "l")
+abline(lm(present$boys / (present$boys + present$girls) ~ present$year))
+plot(present$year, present$girls / (present$boys + present$girls), type = "l")
+abline(lm(present$girls / (present$boys + present$girls) ~ present$year))
+
+```
+
+
+
+We infer that, the regression line of proportion of boys over time decreases over the years and is above 0.5
+and the regression line of proportion of girls over time increases over years and is below 0.5. Therefore, the number of boys increases over the years as compared to number of girls. 
+
+Therefore Arbuthnot's observation about boys being born in greater proportion than girls hold up in the U.S.
+
+4) In what year did we see the most total number of births in the U.S.?
+
+Answer 4) Analyzing using plot
+```{r}
+plot(present$year, (present$boys + present$girls), type = "l")
+
+```
+
+ 
+ 
+ Analyzing using calculation, to be more precise
+```{r}
+present$year[(present$boys + present$girls) == max(present$boys + present$girls)]
+```
+ Therefore, the year 1961 , it's the most total number of births in the U.S
