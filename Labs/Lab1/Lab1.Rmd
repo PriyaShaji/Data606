@@ -1,0 +1,382 @@
+---
+title: "Lab1"
+author: "Priya Shaji"
+date: "February 4, 2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load the cdc dataset
+
+```{r}
+source("more/cdc.R")
+```
+
+view the names of the variables
+
+```{r}
+dim(cdc)
+names(cdc)
+```
+
+## EXERCISE 1
+How many cases are there in this data set? How many variables? For each variable, identify its data type (e.g. categorical, discrete).
+
+Answer 1.
+
+Cases: 20,000  
+variables: 9
+Data Type of each variable
+genhlth - Categorical
+exerany - Categorical
+hlthplan - Categorical
+smoke100 - Categorical
+height - Numeric, continuous
+weight - Numeric, continuous
+wtdesire - Numeric, continuous
+age - Numeric, discrete(since age can take only integer values, therefore it's discrete)
+gender - Categorical
+
+
+First few entries (rows) of our data
+
+```{r}
+head(cdc)
+```
+
+Last few entries (rows) of our data
+
+```{r}
+tail(cdc)
+```
+
+summary of column weight
+
+```{r}
+summary(cdc$weight)
+```
+
+calculate the mean, median, and variance of weight
+
+```{r}
+mean(cdc$weight)
+var(cdc$weight)
+median(cdc$weight)
+```
+
+
+For categorical data, we consider their sample frequency or relative frequency distribution
+For example, to see the number of people who have smoked 100 cigarettes in their lifetime
+
+```{r}
+table(cdc$smoke100)
+table(cdc$smoke100)/20000
+```
+
+bar plot of the entries in the table
+
+```{r}
+barplot(table(cdc$smoke100))
+```
+
+## Exercise 2
+Create a numerical summary for height and age, and compute the interquartile range for each. Compute the relative frequency distribution for gender and exerany. How many males are in the sample? What proportion of the sample reports being in excellent health?
+
+Answer2.
+
+summary for height and age
+
+```{r}
+##height
+summary(cdc$height)
+
+##age
+summary(cdc$age)
+```
+
+
+Interquartile range for each
+
+```{r}
+##height
+70.00-64.00
+
+##age
+57.00-31.00
+```
+
+
+ relative frequency distribution for gender and exerany
+ 
+```{r}
+##gender
+table(cdc$gender)/20000
+
+##exerany
+table(cdc$exerany)/20000
+```
+
+
+
+How many males are in the sample
+
+```{r}
+table(cdc$gender)
+
+```
+
+No. of males are: 9569
+47.8% of the sample are males
+
+
+What proportion of the sample reports being in excellent health?
+
+```{r}
+table(cdc$genhlth)/20000
+```
+
+
+The table command can be used to tabulate any number of variables 
+
+```{r}
+table(cdc$gender,cdc$smoke100)
+```
+
+create a mosaic plot of this table
+
+```{r}
+mosaicplot(table(cdc$gender,cdc$smoke100))
+```
+
+## Exercise 3
+What does the mosaic plot reveal about smoking habits and gender?
+
+Answer 3.
+
+Mosaic plot of above table shows us that the smoking habits of males are higher as compared to females
+
+sixth variable of the 567th respondent
+
+```{r}
+cdc[567,6]
+```
+
+
+the weights for the first 10 respondents 
+
+```{r}
+cdc[1:10,6]
+```
+
+all of the data for the first 10 respondents
+
+```{r}
+cdc[1:10,]
+```
+
+
+to extract just the data for the men in the sample,create a subset
+
+```{r}
+mdata <- subset(cdc, cdc$gender == "m")
+head(mdata)
+```
+
+
+to extract just the data for the men and also who are over 30 in the sample
+
+```{r}
+m_and_over30 <- subset(cdc, gender == "m" & age > 30)
+```
+
+
+to extract just the data for the men orwho are over 30 in the sample
+
+```{r}
+m_or_over30 <- subset(cdc, gender == "m" | age > 30)
+```
+
+
+## Exercise 4
+Create a new object called under23_and_smoke that contains all observations of respondents under the age of 23 that have smoked 100 cigarettes in their lifetime. Write the command you used to create the new object as the answer to this exercise.
+
+Answer 4.
+
+```{r}
+under23_and_smoke<-subset(cdc, smoke100 = 1 & age < 30)
+head(under23_and_smoke)
+```
+
+
+construct a box plot for a single variable
+
+```{r}
+boxplot(cdc$height)
+```
+
+
+compare the locations of the components of the box by examining the summary statistics.
+
+```{r}
+summary(cdc$height)
+```
+
+
+compare the heights of men and women using boxplot
+
+```{r}
+boxplot(cdc$height ~ cdc$gender)
+```
+
+
+make a new object called bmi and then creates box plots of these values, defining groups by the variable  cdc$genhlth.
+
+
+```{r}
+bmi <- (cdc$weight / cdc$height^2) * 703
+boxplot(bmi ~ cdc$genhlth,ylim=c(10,50))
+```
+
+## Exercise 5
+What does this box plot show? Pick another categorical variable from the data set and see how it relates to BMI. List the variable you chose, why you might think it would have a relationship to BMI, and indicate what the figure seems to suggest.
+
+Answer 5.
+
+bmi does not seem to depend much on the general health facor. Respondants with excellent to very good health seems to have lower bmi's when combared to bmi's of respondants of good, fair,poor heath
+ 
+```{r}
+## using 'gender' as a variable
+bmi <- (cdc$weight / cdc$height^2) * 703
+boxplot(bmi ~ cdc$gender,ylim=c(10,50))
+
+```
+
+
+
+males seems to have lower bmi's as compared to females
+
+
+## On Your Own
+1. Make a scatterplot of weight versus desired weight. Describe the relationship between these two variables.
+
+Answer 1.
+
+```{r}
+plot(cdc$weight~cdc$wtdesire)
+
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(cdc,aes(wtdesire,weight)) + geom_point(alpha=1/10)
+ggplot(cdc[which(cdc$wtdesire < 400),],aes(wtdesire,weight)) + geom_point(alpha=1/10)
+
+```
+
+
+
+
+Current weight and desired weight factors are correlated.Seems like more number of respondants have their desired weight equal to their current weight. For some people current weight tends to be higher than their desired weight.
+
+
+
+
+2.Let's consider a new variable: the difference between desired weight (wtdesire) and current weight (weight). Create this new variable by subtracting the two columns in the data frame and assigning them to a new object called wdiff.
+
+Answer 2.
+```{r}
+wdiff<-cdc$weight-cdc$wtdesire
+head(wdiff)
+```
+
+
+
+
+the data type of 'wdiff' is: numeric and discrete.
+If an observation wdiff is 0: The respondant have the same current weight and desired weight
+if  wdiff is positive: respondants current weight  > desired weight(They want to loose weight)
+if  wdiff is negetive: respondants current weight  < desired weight(They may or may not want to loose weight)
+
+
+
+4. Describe the distribution of wdiff in terms of its center, shape, and spread, including any plots you use. What does this tell us about how people feel about their current weight?
+
+Answer 4.
+
+
+```{r}
+hist(wdiff,xlab="Current weight - Desired weight",ylab="Number of individuals",main="",labels=TRUE)
+median(wdiff)
+```
+
+
+
+
+By the above obervation , there are more respondants who wish to loose weight or their current weight is higher that the desired weight.
+
+Center of the data is 10 , means half of the respondants current weight is higher than the desired weight and wish to loose 10 pounds.
+
+The plot is left-skewed, means there are only a few respondants who weigh less than their desired weight. So they wish to loose less weight or they do not wish to loose weight at all.
+
+
+
+
+5. Using numerical summaries and a side-by-side box plot, determine if men tend to view their weight differently than women.
+
+Answer 5.
+
+```{r}
+##Analyzing for males
+summary(cdc$weight,cdc$gender=='m')
+##Analyzing for females
+summary(cdc$weight,cdc$gender=='f')
+```
+
+
+
+
+create a dataframe
+
+```{r}
+weight_gender<-data.frame(wdiff = wdiff,gender = cdc$gender)
+
+## remove the two outliers who's data points show 600+ pounds weight
+weight_gender <- weight_gender[which(cdc$wtdesire < 600),]
+## generate the side by side boxplot
+boxplot(wdiff ~ gender,data=weight_gender)
+```
+
+
+
+
+By observing the above plot, we infer that females wants to loose more weight as compared to men. And also female's current weight is greater that the desired weight . With men's weight data points are more towards the negative scale, it shows that most of the men's current weight is less than the desired weight.
+
+
+
+6. Now it's time to get creative. Find the mean and standard deviation of weight and determine what proportion of the weights are within one standard deviation of the mean.
+
+
+Answer 6.
+
+```{r}
+mean(cdc$weight)
+sd(cdc$weight)
+```
+
+
+
+
+what proportion of the weights are within one standard deviation of the mean.
+
+```{r}
+below_sd <- mean(cdc$weight) - sd(cdc$weight)
+above_sd <- mean(cdc$weight) + sd(cdc$weight)
+length(which(cdc$weight >= below_sd & cdc$weight <= above_sd))/20000
+```
+
