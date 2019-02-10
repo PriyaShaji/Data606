@@ -1,0 +1,220 @@
+---
+title: "Homework_1"
+author: "Priya Shaji"
+date: "February 7, 2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1.8 Smoking habits of UK residents.
+(a) What does each row of the data matrix represent?
+Answer (a)
+
+Each row repressents the responses of each individual respondants who answered the survey questions.
+
+
+(b) How many participants were included in the survey?
+
+```{r}
+smoking <- read.csv(url("https://raw.githubusercontent.com/jbryer/DATA606Spring2019/master/data/os3_data/Ch%201%20Exercise%20Data/smoking.csv"), header = FALSE)
+nrow(smoking)
+```
+
+
+
+Answer (b)
+
+1691 participants
+
+
+(c) Indicate whether each variable in the study is numerical or categorical. If numerical, identify
+as continuous or discrete. If categorical, indicate if the variable is ordinal.
+
+
+Answer (c)
+
+gender - categorical  
+age - numerical (discrete) 
+maritalStatus - categorical
+highestQualification - categorical(ordinal)
+nationality - categorical
+ethnicity - categorical
+grossincome - categorical (ordinal) 
+region - categorical
+smoke - categorical  
+amtWeekends - numerical (discrete)
+AmtWeekdays - numerical (discrete)
+type - categorical
+
+## 1.10 Cheaters, scope of inference.
+
+(a) Identify the population of interest and the sample in this study.
+
+Answer (a)
+
+The population of interest are childern, the sample is 160 children aged between
+5 and 15
+
+(b) Comment on whether or not the results of the study can be generalized to the population, and
+if the findings of the study can be used to establish causal relationships
+
+Answer (b)
+
+The results of the study cannot be generalised since it's not sure whether the population of analysis were chosen based on certain criteria or based on certain factors. The findings of the study are based on experimental analysis, therefore it cannot be used to build casual relationships.
+
+## 1.28 Reading the paper
+Answer (a) 
+according to the data given:
+pack-a-day       37% more likely
+two-pack-a-day   44% more likely
+more -than-two   twice the risks
+Therefore, by these observations , we can conclude that smoking causes dimentia later in life and risks are likely to increase with increase in smoking rate.
+
+Answer (b)
+Sleep disorders maynot lead to bullying in children. A child can be a bully based on various other factors, like, various family issues that disturbs the mental well being of a child, bullying child might have gone through same bullying experiance , child abuse, etc. Therefore, corelating sleep disorder only with bullying in children is not justified.
+
+## 1.36 Exercise and mental health.
+
+(a) What type of study is this?
+Answer (a)
+
+it is a randomized study
+
+(b) What are the treatment and control groups in this study?
+Answer (b)
+
+treatment group: the group which is told to exercise twice a week
+control group: the group who is told not to exercise.(half the subject)
+
+(c) Does this study make use of blocking? If so, what is the blocking variable?
+Answer (c)
+
+Yes, this study makes use of age groups as a blocking variable.
+
+(d) Does this study make use of blinding?
+Answer (d)
+
+No blinding is used. both the respondants and researchers are aware of the group who are exercising and not exercising.
+
+(e) Comment on whether or not the results of the study can be used to establish a causal relationship between exercise and mental health, and indicate whether or not the conclusions can
+be generalized to the population at large.
+Answer (e)
+
+There was random sampling of the population and also each group were assigned tasks to do, therefore  the results of the study can be used to establish a causal relationship between exercise and mental health.
+
+Conclusion can be generalised to the population , since this is a randomized experiment.
+
+(f) Suppose you are given the task of determining if this proposed study should get funding.
+Would you have any reservations about the study proposal?
+Answer (f)
+
+No,I would not have any restrictions on the study proposal, since the analysis is done based on factors which are analytically strong ,like, randomized sample, blocking age groups, compairing results, clear instructions given for the experiment.
+
+## 1.48 Stats scores.
+
+```{r}
+scores <- (c(57, 66, 69, 71, 72, 73, 74, 77, 78, 78, 79, 79, 81, 81, 82, 83, 83,              88, 89, 94))
+boxplot(scores, main = "Final Exam Scores", ylab = "Scores")
+```
+
+## 1.50 Mix-and-match.
+
+histogram (A) matches box plot (2) : it is symmetrical, unimodal and uniformly distributed
+
+histogram (B) matches with box plot (3): it is symmetrical, multimodal and a rough uniform distribution
+
+histogram (C) matches with box plot (1): it is right skewed distribution, unimodal
+
+## 1.56 Distributions and appropriate statistics, Part II .
+
+(a) Distribution will be left skewed: the 3rd quartile is less densely populated than the first two quartiles.
+
+Median would best represent this typical observation in the data: it will lessen the effect of extreme values
+
+variability of observations would be best represented by IQR, because SD can be sensitive to extreme values.
+
+(b)Distribution seems to be symmetric. There are only few expensive houses, which would not skew the data much and the quartile ranges are similar
+
+Median would best represent this typical observation in the data: it will lessen the effect of extreme values
+
+variability of observations would be best represented by IQR, because SD can be sensitive to extreme values.
+
+(c) It will be left-skewed distribution since most of the students will be at the minimum value of zero(non-drinkers) and since very few drink excessively.
+
+The median would best represent the typical observation since it will lessen the effects of the all the non-drinkers and the excessive drinkers.
+
+The variability would be best represented by the IQR because the SD would be sensitive to all the non-drinkers and the excessive drinkers.
+
+(d) It will be a symetrical distribution.
+
+The median would best represent the typical observation since it will lessen the effect of the extreme values of the high-level executives.
+
+The variability would be best represented by the IQR because the SD would be sensitive to the extreme values of the high-level executives.
+
+## 1.70 Heart transplants.
+```{r}
+heartTr<- read.csv(url("https://raw.githubusercontent.com/jbryer/DATA606Spring2019/master/data/os3_data/Ch%201%20Exercise%20Data/heart_transplant.csv"))
+heartTr
+```
+
+(a) As per the mosaic plot, the survival is not independent since the expectancy of life is bigger for the patients who got the heart transplant.
+
+(b)  The box plot shows that that the heart transplant is effective for increase of life expectancy. 
+
+(c)
+
+```{r}
+patientcont_dead <- nrow(subset(heartTr, heartTr$transplant == 
+    "control" & heartTr$survived == "dead"))
+patientcont <- nrow(subset(heartTr, heartTr$transplant == 
+    "control"))
+patienttreat_dead <- nrow(subset(heartTr, heartTr$transplant == 
+    "treatment" & heartTr$survived == "dead"))
+patienttreat <- nrow(subset(heartTr, heartTr$transplant == 
+    "treatment"))
+patientcont_deadratio <- patientcont_dead/patientcont
+patienttreat_deadratio <- patienttreat_dead/patienttreat
+patientcont_deadratio
+patienttreat_deadratio
+```
+
+
+88.23% of the patients in the control group died by the end of the study and
+65.22% of the patients in the treatment group died by the end of the study.
+
+(d)
+                                                                          
+1. The claim being tested is whether or not a heart transplant will increase a patient's lifespan.
+
+2. 
+
+```{r}
+alive <- sum(heartTr$survived == "alive")
+alive
+
+dead <- sum(heartTr$survived == "dead")
+dead
+
+patienttreat
+patientcont
+
+patienttreat_deadratio - patientcont_deadratio
+
+
+```
+
+28
+75
+69
+34
+-0.230179
+at least as extreme or greater.
+
+3. 
+
+It seems that a difference of at least -23.02% due to chance alone would only happen about 2% of the time according to the figure. Such a low probability indicates a rare event.
