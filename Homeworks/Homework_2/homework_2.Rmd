@@ -1,0 +1,240 @@
+---
+title: "Homework_2"
+author: "Priya Shaji"
+date: "2/15/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Probability{.tabset}
+### 2.6
+
+(a) getting a sum of 1? 
+
+We assume a fair dice with values 1-6
+
+
+Zero, minimum sum that can be obtained from a pair of dice is 2(1+1).
+
+(b) getting a sum of 5?
+
+Possible combinations for argetting the sum of 5 are (1,4), (2,3), (3,2), (4,1). 
+
+So probability of getting a sum of 5 is 
+
+4/36 = 1/9
+
+(c) getting a sum of 12?
+
+Possible combinations for argetting the sum of 12 are (6,6)
+
+So probability of getting a sum of 12 is 
+=1/36
+
+### 2.8
+
+(a) Are living below the poverty line and speaking a foreign language at home disjoint?
+
+No. As according to the statistics 4.2% fall into both living below the proverty line and speaking a foreign language.
+
+(b) Draw a Venn diagram summarizing the variables and their associated probabilities.
+
+The following venn diagram summarizze the variables and their associated probabilities:
+
+```{r}
+library(VennDiagram)
+poverty <- 14.6
+foreign_Language <- 20.7
+both <- 4.2
+povertyOnly <- poverty - both
+foreign_Language_Only <- foreign_Language - both
+venn.plot <- draw.pairwise.venn(poverty, 
+                   foreign_Language,
+                   cross.area=both, 
+                   c("Poverty", "Foreign Language"), 
+                   fill=c("pink", "lightblue"),
+                   cat.dist=-0.08,
+                   ind=FALSE)
+
+```
+
+```{r}
+grid.draw(venn.plot)
+```
+
+
+
+(c) What percent of Americans live below the poverty line and only speak English at home?
+
+```{r}
+14.6-4.2
+```
+
+
+
+(d) What percent of Americans live below the poverty line or speak a foreign language at home?
+
+```{r}
+14.6+20.7-4.2
+```
+
+
+
+(e) What percent of Americans live above the poverty line and only speak English at home?
+
+```{r}
+100-(14.6+20.7-4.2)
+```
+
+
+
+
+(f) Is the event that someone lives below the poverty line independent of the event that the person speaks a foreign language at home?
+
+The event that someone lives below the poverty line is not independent of the event that the person speaks a foreign language at home.
+
+### 2.20
+
+ (a) What is the probability that a randomly chosen male respondent or his partner has blue eyes?
+```{r}
+(114+19+11)/204
+```
+ 
+ 
+(b) What is the probability that a randomly chosen male respondent with blue eyes has a partner with blue eyes?
+```{r}
+(78/114)
+```
+
+(c) Whatistheprobabilitythatarandomlychosenmalerespondentwithbrowneyeshasapartner with blue eyes? What about the probability of a randomly chosen male respondent with green eyes having a partner with blue eyes?
+```{r}
+(19/54)
+```
+
+
+(d) Does it appear that the eye colors of male respondents and their partners are independent? Explain your reasoning.
+
+The eye colors of male respondents and their partners are NOT independent.
+
+P(blue male | blue female) = P(blue male) * P(blue female) (78/204) = (114/204) * (108/204).The values are not equal Therefore, eye colors of male respondents and their partners are NOT independent.
+
+### 2.30
+  (a) Find the probability of drawing a hardcover book first then a paperback fiction book second when drawing without replacement.
+  
+```{r}
+(28/95) * (59/94)
+```
+  
+  
+(b) Determine the probability of drawing a fiction book first and then a hardcover book second, when drawing without replacement.
+
+```{r}
+(72/95) * (28/94)
+```
+
+
+(c) Calculate the probability of the scenario in part (b), except this time complete the calculations under the scenario where the first book is placed back on the bookcase before randomly drawing the second book.
+
+```{r}
+(72/95) * (28/95)
+```
+
+
+(d) The final answers to parts (b) and (c) are very similar. Explain why this is the case.
+
+The final answers to parts (b) and (c) are very similar because the possible events are considerable large so the outcome will not be affected much.
+
+
+### 2.38
+
+(a) Build a probability model, compute the average revenue per passenger, and compute the corresponding standard deviation.
+
+```{r}
+bag_piece <- c(0, 1, 2)
+bag0 <- 0
+bag1 <- 25
+bag2 <- bag1 + 10
+bag_fee <- c(bag0, bag1, bag2)
+bag_percent <- c(0.54, 0.34, 0.12)
+bag_revenue_per_person <- sum(bag_fee * bag_percent)
+bag_revenue_per_person
+```
+
+
+```{r}
+variance <- (25^2*.34 + 35^2*.12) - 12.7^2
+variance
+```
+
+
+
+```{r}
+standart_deviation <- sqrt(variance)
+standart_deviation
+```
+
+
+Revenue per person is $12.7, Variance is 198.21 and the standard deviation is 14.07871
+
+
+(b) About how much revenue should the airline expect for a flight of 120 passengers? With what standard deviation? Note any assumptions you make and if you think they are justified.
+
+```{r}
+revenue_120 <- 12.7 * 120
+revenue_120
+```
+
+```{r}
+standart_deviation_120 <- sqrt(variance * 120)
+standart_deviation_120
+```
+
+
+The expected revenue for the 120 passengers is $1524. The standard deviation will be $154.2245
+
+### 2.44
+
+(a) Describe the distribution of total personal income.
+
+```{r}
+income <- c("$1 to $9,999","$10,000 to $14,999","$15,000 to $24,999","$25,000 to $34,999","$35,000 to $49,999","$50,000 to $64,999","$65,000 to $74,999","$75,000 to $99,999","$100,000 or more")
+
+total <- c(2.2,4.7,15.8,18.3,21.2,13.9,5.8,8.4,9.7)
+
+distribution <- data.frame(income, total)
+distribution
+```
+
+```{r}
+barplot(distribution$total, names.arg=income)
+```
+
+It seems normalcontinuous distribution.
+
+(b) What is the probability that a randomly chosen US
+resident makes less than $50,000 per year?
+```{r}
+sum(distribution[1:5,2]/100)
+```
+
+(c) What is the probability that a randomly chosen US resident makes less than $50,000 per year and is female?
+Note any assumptions you make.
+
+```{r}
+0.622 * 0.41
+```
+Sample consists of 41% females.
+The probability that a randomly chosen US resident makes less than $50,000 per year and is female is 0.25502
+
+Assumption: The probability of an income of less than $50,000 and being female are independent events.
+
+(d) The same data source indicates that 71.8% of females
+make less than $50,000 per year. Use this value to determine whether or not the assumption you made in part (c) is valid.
+Income Total
+
+If 71.8% of females make less than $50,000 per year the equation will be 0.718 = 0.622 * 0.41, which is not correct, so we can conclude that the assumption we made for step (c) is wrong. with the equation it looks like events are not independent.
