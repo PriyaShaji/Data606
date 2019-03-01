@@ -1,0 +1,307 @@
+---
+title: "Homework_3"
+author: "Priya Shaji"
+date: "2/25/2019"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r, include=FALSE}
+devtools::install_github("jbryer/DATA606")
+library('DATA606')
+
+```
+
+## Distributions of Random Variables {.tabset}
+### 3.2
+What percent of a standard normal distribution N(μ =
+0, sd = 1) is found in each region? Be sure to draw a graph.
+
+
+#### Z >-1.13
+```{r}
+μ <- 0
+sd <- 1
+Z <- -1.13
+# finding value for 'x'
+x <- Z * sd + μ
+x
+# finding probability
+1 - pnorm(x, mean = 0, sd = 1)
+# graph
+normalPlot(bounds=(c(-1.13,Inf)))
+```
+
+
+#### Z <0.18
+
+```{r}
+μ <- 0
+sd <- 1
+Z <- 0.18
+# finding value for 'x'
+x <- Z * sd + μ
+x
+# finding probability
+1 - pnorm(x, mean = 0, sd = 1)
+# graph
+normalPlot(bounds=(c(0.18,Inf)))
+```
+
+
+#### Z > 8 
+```{r}
+μ <- 0
+sd <- 1
+Z <- 8
+# finding value for 'x'
+x <- Z * sd + μ
+x
+# finding probability
+1 - pnorm(x, mean = 0, sd = 1)
+# graph
+normalPlot(bounds=(c(8,Inf)))
+```
+
+#### |Z|<0.5
+```{r}
+μ <- 0
+sd <- 1
+Z <- 0.5
+# finding value for 'x'
+x <- Z * sd + μ
+x
+# finding probability |x| < 0.5 = -x < 0.5 < x
+x1 <- pnorm(-x, mean = 0, sd = 1)
+x2 <- pnorm(x, mean = 0, sd = 1)
+x2 - x1
+# graph
+normalPlot(bounds=(c(-x,x)))
+```
+
+### 3.4
+
+
+a) Write down the short-hand for these two normal distributions.
+
+Answer a)
+
+N(μ=4313, sd=583) → Men, Ages 30 - 34
+
+N(μ=5261, sd=807) → Women, Ages 25 - 29
+
+
+(b) What are the Z-scores for Leo’s and Mary’s finishing times? What do these Z-scores tell you?
+
+Answer b)
+
+
+```{r}
+# Z score for Leo's finishing time
+μ <- 4313
+sd <- 583
+x <- 4948
+# finding value for 'x'
+Z <- (x - μ) / sd
+Z
+# Z score for Mary's finishing time
+μ <- 5261
+sd <- 807
+x <- 5513
+# finding value for 'x'
+Z <- (x - μ) / sd
+Z
+```
+
+The Z score of an observation is the number of standard deviations it falls above or below the mean.
+
+For Leo, its Z score is 1.089, the number of standard deviation is above the mean.
+
+For Mary, its Z score is 0.312, the number of standard deviation is below the mean.
+
+C) Did Leo or Mary rank better in their respective groups? Explain your reasoning.
+
+Answer c)
+
+Mary get lower Zscore:0.312 than Leo Zscore: 1.089, that mean mary get faster time than their respective groups.
+
+
+d) What percent of the triathletes did Leo finish faster than in his group?
+
+
+Answer d)
+
+```{r}
+Percent_Leo <- 1-pnorm(1.089)
+Percent_Leo
+```
+
+e) What percent of the triathletes did Mary finish faster than in her group?
+
+Answer e)
+
+```{r}
+Percent_Mary <- 1-pnorm(0.312)
+Percent_Mary
+```
+
+
+f) If the distributions of finishing times are not nearly normal, would your answers to parts (b) - (e) change? Explain your reasoning.
+
+Answer f)
+
+The part b and c would not be changed, because the ranking will not be changed and Zscore still reflect above or below mean. But the part d & e will be changed, “Pnorm” only used for normal distribution.
+
+### 3.18
+
+a) The mean height is 61.52 inches with a standard deviation of 4.58 inches. Use this information to determine if the heights approximately follow the 68-95-99.7% Rule.
+
+Answer a)
+
+
+```{r}
+hgt <- c(54, 55, 56, 56, 57, 58, 58, 59, 60, 60, 60, 61, 61, 62, 62, 63, 63, 63, 64, 65, 65, 67, 67, 69, 73)
+
+summary(hgt)
+
+pnorm(61.52+1*4.58,mean=61.52,sd=4.58)
+
+pnorm(61.52+2*4.58,mean=61.52,sd=4.58)
+
+pnorm(61.52+3*4.58,mean=61.52,sd=4.58)
+```
+
+
+
+Probability for falling within 1 standard deviation of the mean is close to 99.7%.
+
+So the distribution of the heights does not approximately follow the 68-95-99.7% Rule.
+
+b) Do these data appear to follow a normal distribution? Explain your reasoning using the graphs provided below.
+
+Answer b)
+
+It appear that it follows normal distribution. The point of the q-q plot fall within the boundries.The QQ-plot of the data shows that points tend to follow the line but with some deviation on both high and low ends.
+
+### 3.22
+
+(a) What is the probability that the 10th transistor produced is the first with a defect?
+
+
+Answer a)
+
+probability that the transistor is defective = .02
+
+```{r}
+pgeom(10-1,0.02)
+```
+
+
+(b) What is the probability that the machine produces no defective transistors in a batch of 100?
+
+
+Answer b)
+
+The probabilty that the 101th transistor is defective
+
+```{r}
+pgeom(100,0.02)
+```
+
+(c) On average, how many transistors would you expect to be produced before the first with a
+defect? What is the standard deviation?
+
+Answer c)
+
+
+```{r}
+#mean
+1/0.02
+#standard deviation
+sqrt((1-0.02)/0.02^2)
+```
+
+
+
+(d) Another machine that also produces transistors has a 5% defective rate where each transistor
+is produced independent of the others. On average how many transistors would you expect to
+be produced with this machine before the first with a defect? What is the standard deviation?
+
+Answer d)
+
+```{r}
+#mean
+1/0.05
+#standard deviation
+sqrt((1-0.05)/0.05^2)
+```
+
+(e) Based on your answers to parts (c) and (d), how does increasing the probability of an event
+affect the mean and standard deviation of the wait time until success?
+
+Answer e)
+
+Increasing the probability of success decreases the wait time for success and decreases the spread in the distribution
+
+### 3.38
+
+(a) Use the binomial model to calculate the probability that two of them will be boys.
+
+Answer a)
+
+
+```{r}
+dbinom(2,3,0.51)
+```
+
+(b) Write out all possible orderings of 3 children, 2 of whom are boys. Use these scenarios to calculate the same probability from part (a) but using the addition rule for disjoint outcomes.
+
+Answer b)
+
+```{r}
+# BBG GBB BGB #
+(0.51^2)*0.49*3
+```
+
+Confirm that your answers from parts (a) and (b) match.
+
+My answer for (a) and (b) matched - 0.382347. 
+
+
+(c) If we wanted to calculate the probability that a couple who plans to have 8 kids will have
+3 boys, briefly describe why the approach from part (b) would be more tedious than the approach from part (a).
+
+Answer c)
+
+The approach from part (b) will be more tedious because you have to manually draw all the possible combinations of 3 boys from 8 siblings while in (a) the choose function will compute that number for you
+
+### 3.42
+
+a) What is the probability that on the 10th try she will make her 3rd successful serve?
+
+Answer a)
+
+
+```{r}
+choose(9,2)*0.15^3*0.85^7
+```
+
+
+(b) Suppose she has made two successful serves in nine attempts. What is the probability that
+her 10th serve will be successful?
+
+Answer b)
+
+Since each attempt is independent of each other and the probability of success is the same for each attempt, the probability of success on the 10th serve is the same as the probability of success for the previous 9 servers - 0.15
+
+
+(c) Even though parts (a) and (b) discuss the same scenario, the probabilities you calculated should be different. Can you explain the reason for this discrepancy?
+
+Answer c)
+
+(a) fits the case of a negative binonmial distribution - (probability of kth success on the nth trial). For (a) we are looking for the 3rd success (the last attempt being a success) after the 10th attempt. For (b), we are not concern about the probabilities of the first 9 attempts - we are only concern about the probability of success on the 10 attempt.
+
