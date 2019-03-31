@@ -1,0 +1,138 @@
+---
+title: "DATA 606 Project Proposal"
+author: "Priya Shaji"
+date: "3/30/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+### Data Preparation
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+# load data
+adolescent_fertility_rates <- read.csv("https://raw.githubusercontent.com/PriyaShaji/Adolescent-Pregnancy-Final-Projects/master/Adolecent_Fertility_Rates.csv", header=TRUE, check.names = FALSE)
+gendered_financial_indicators <- read.csv("https://raw.githubusercontent.com/PriyaShaji/Adolescent-Pregnancy-Final-Projects/master/Gendered_Financial_Indicators.csv", header=TRUE, check.names = FALSE)
+gendered_world_indicators <- read.csv("https://raw.githubusercontent.com/PriyaShaji/Adolescent-Pregnancy-Final-Projects/master/Gender_World%20_Indicators.csv", header=TRUE, check.names = FALSE)
+
+```
+
+
+### Research question 
+
+**You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**
+
+By doing this porject , I want to research about the following questions:
+
+1) Which countries have the most significant increasing/decreasing adolescent fertility rates. 
+
+2) Determine potential reasons for what in particular makes countries with decreasing or consistent fertility rates different from countries with higher or increasing fertility rates? 
+
+
+### Cases 
+
+**What are the cases, and how many are there?**
+
+Each country forms it’s own case and demonstrates rate of adolescent fertility for women aged 15 to 19 years old. There are 261 countries, therefore there are 261 cases.
+
+
+### Data collection 
+
+**Describe the method of data collection.**
+
+The World Bank has an up-to-date (as of 2015) data-set with adolescent fertility rates for 261 countries ranging 45 years. It also has financial indicators for each country broken down by gender.
+
+
+### Type of study 
+
+**What type of study is this (observational/experiment)?**
+
+This is an observational study looking at data from 1960 to 2015 for the most populous countries in the world.
+
+### Data Source 
+
+**If you collected the data, state self-collected. If not, provide a citation/link.**
+
+Fertility Data is found here: https://data.worldbank.org/indicator/SP.ADO.TFRT 
+
+World Development Indicators are found here: http://wdi.worldbank.org/table/WV.5 https://data.worldbank.org/topic/gender
+
+
+### Dependent Variable
+
+**What is the response variable? Is it quantitative or qualitative?**
+
+The response variable is quantitative value (numerical value) demonstrating a weighted average of births per 1,000 women ages 15-19. This is used to determine fertility rates for adolecent girls.
+
+
+### Independent Variable
+
+**You should have two independent variables, one quantitative and one qualitative.**
+
+The explanatory variable is world development indicators and are also numerical (some are percentage, one is age, another is binary). Sample variables include: “Life Expectancy”, “% with Account at a Financial Institution”, “% Women in Parliaments”, and “Nondiscrimination clause mentions gender in the constitution”
+
+
+### Relevant summary statistics 
+
+**Provide summary statistics for each the variables. Also include appropriate visualizations related to your research question (e.g. scatter plot, boxplots, etc). This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+
+```{r}
+library(tidyr)
+library(dplyr)
+
+tidy_adolescent_fertility_rates <- gather(adolescent_fertility_rates, "year", "n", 5:60) 
+colnames(tidy_adolescent_fertility_rates)[colnames(tidy_adolescent_fertility_rates) == "Country Name"] <- "Country"
+tidy_adolescent_fertility_rates <- select(tidy_adolescent_fertility_rates, one_of("Country", "year", "n"))
+head(tidy_adolescent_fertility_rates)
+
+```
+
+summary for adolescent fertility rate tidy dataset
+
+```{r}
+summary(tidy_adolescent_fertility_rates)
+```
+
+
+India's Fertility Rates
+
+
+```{r}
+library(ggplot2)
+
+India_Fertility <- filter(tidy_adolescent_fertility_rates, Country=="India")
+
+India <- ggplot(India_Fertility, aes(year, n))
+India + geom_jitter() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+
+World Indicators Exploratory Variables
+
+
+```{r}
+tidy_gendered_world_indicators <- gather(gendered_world_indicators, "year", "n", 5:60) 
+colnames(tidy_gendered_world_indicators)[colnames(tidy_gendered_world_indicators) == "Country Name"] <- "Country"
+colnames(tidy_gendered_world_indicators)[colnames(tidy_gendered_world_indicators) == "Indicator Name"] <- "Indicator"
+tidy_gendered_world_indicators <- select(tidy_gendered_world_indicators, one_of("Country", "Indicator","year", "n"))
+head(tidy_gendered_world_indicators)
+```
+
+
+India’s Female Labor force Participlation Rate
+
+Sample Exploratory Variable we can use for analysis
+
+```{r}
+India_Labor_Force <- filter(tidy_gendered_world_indicators, (Country=="India") & (Indicator == "Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate)"))
+
+India_Labor_Force <- ggplot(India_Labor_Force, aes(year, n))
+India_Labor_Force + geom_jitter() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+
+We can make a lot of linear regression comparions between various variables, comparing it to adolescent fertility, and use statistical inference techniques to determine best variables to use.
+
+We can generalize the top 10 countries which have the highest fertility rates and reserach resons for the same using statistical analysis.
