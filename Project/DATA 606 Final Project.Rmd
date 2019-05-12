@@ -1,0 +1,1313 @@
+---
+title: "DATA 606 Final Project"
+author: "Priya Shaji"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+    option: code_folding
+    toc: true
+    df_print: paged
+---
+
+
+
+##  Adolescent Pregnancy Analysis {.tabset}
+
+### Introduction
+
+
+<strong>What is Adolescent Prenancy?</strong>
+
+Teenage pregnancy, also known as adolescent pregnancy, is pregnancy in a female under the age of 20.
+
+Adolescent pregnancies are a global problem that occurs in high, middle, and low income countries. Around the world, adolescent pregnancies are more likely to occur in marginalized communities, commonly driven by poverty and lack of education and employment opportunities 
+
+Generally, what I have come across is, looking over economic growth or GDP of a nation, some can derive conclusions of the nation's adolescent fertility rate. But once we dig deeper into the data, I realize some nation's adolescent fertility rate are independent of it's economic growth. Therefore, to analyze this issue, I decided to research on this topic for my DATA 606 project.
+
+Additionally, regional differences reveal unequal progress: adolescent birth rates range from a high of 115 births per 1000 women in West Africa to 64 births per 1000 women in Latin America and the Caribbean to 45 births per 1000 women in South-Eastern Asia, to a low of 7 births per 1000 women in Eastern Asia. There are also up to three times more adolescent pregnancies in rural and indigenous populations than in urban populations. Therefore, this analysis should also be a global concern.
+
+By doing analysis on adolescent pregnancy rates, I want to research on the following point:
+
+1) Which countries have the most significant increasing/decreasing adolescent fertility rates. 
+
+2) Determine potential reasons for what in particular makes countries with decreasing or consistent fertility rates different from countries with higher or increasing fertility rates? 
+
+And, find out solutions on how we can help empower adolescents/women or give them access to the right tools so they won’t be caught in a cycle of continuous pregnancy. 
+
+
+### Data
+
+#### Data collection 
+
+The World Bank has an up-to-date (as of 2015) data-set with adolescent fertility rates for 261 countries ranging 45 years. It also has financial indicators for each country broken down by gender.
+
+
+#### Cases 
+
+Each country forms it’s own case and demonstrates rate of adolescent fertility for women aged 15 to 19 years old. There are 261 countries, therefore there are 261 cases.
+
+
+#### Variables
+
+The response variable is quantitative value (numerical value) demonstrating a weighted average of births per 1,000 women ages 15-19. This is used to determine fertility rates for adolecent girls.
+
+The explanatory variable is world development indicators. Sample variables include: “Life Expectancy”, “% with Account at a Financial Institution”, “% Women in Parliaments”, and “Nondiscrimination clause mentions gender in the constitution”
+
+#### Type of study
+
+This is an observational study looking at data from 1960 to 2015 for the most populous countries in the world.Using information on the sampling design, I have taken three countries based on their different development rates and complete availibility of data and carried exploratory analysis and identified scope of inference. Also conducted hypothesis test and arrived at a conclusion considerng all the results.
+
+
+#### Scope of inference - generalizability
+
+Population of interest are the nations who have complete data values and information in all of their gendered world indicators. They also fall into the category of either developed or developing nation.
+
+Findings from this analysis can be generalized to this population, since all the 261 cases in our dataset fall into the category of either developed or developing country.
+
+If there exists any potential sources of bias that might prevent generalizability, it can be the possibility of the gendered world indicator variables not being equal for each nation. It can vary according to the development of the nation.
+
+#### Scope of inference - causality
+
+These data be used to establish causal links between the variables of interest only for few countries. 
+
+Variable of Interest is the rate of adolescent fertility per 1000 women(n). And as we will explore further, very few nations variable of interest is associated or linked with the data provided
+
+1) Now, since we know our goals of this analysis and are aware of the dataset we have, we will load all the required libraires
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggfortify)
+```
+
+2) Load the `gender world indicator` dataset which was downloaded from [World Bank](http://wdi.worldbank.org/table/WV.5 https://data.worldbank.org/topic/gender)
+
+
+```{r  echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+# load data
+gendered_world_indicators <- read.csv("https://raw.githubusercontent.com/PriyaShaji/Adolescent-Pregnancy-Final-Projects/master/Gender_World%20_Indicators.csv", header=TRUE, check.names = FALSE)
+
+```
+
+
+###  Exploratory data analysis
+
+Let's explore the dataset
+
+3) The first step for an exploratory dataset is to transform the dataset.
+
+Perform data transformations using functions given by tidyr and dplyr packages.
+
+4) We'll gather all the year in the data and make it as a new column name values for column "year"
+
+```{r}
+tidy_gendered_world_indicators <- gather(gendered_world_indicators, "year", "n", 5:60) 
+```
+
+
+
+5) Rename the column name "Country Name" as "Country"
+
+and "Indicator Name" as  "Indicator"
+
+6) The new name of our clean and tidy dataset is tidy_gendered_world_indicators
+
+```{r}
+colnames(tidy_gendered_world_indicators)[colnames(tidy_gendered_world_indicators) == "Country Name"] <- "Country"
+colnames(tidy_gendered_world_indicators)[colnames(tidy_gendered_world_indicators) == "Indicator Name"] <- "Indicator"
+tidy_gendered_world_indicators <- select(tidy_gendered_world_indicators, one_of("Country", "Indicator","year", "n"))
+tidy_gendered_world_indicators <- na.omit(tidy_gendered_world_indicators)
+indicators <- unique(tidy_gendered_world_indicators$Indicator)
+```
+
+
+As per [US National Library of Medicine National Institutes of Health Search database](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4852976/), I aim to focus on United states, Switzerland,Philippines.These three countries have varied adolescent birth rates. While the adolescent birth rate in the US and Philippines has been increasing, in Switzerland it is decreasing significantly.
+
+
+<strong> Let's take an overall perspective for the three states(Philippines ,United States, Switzerland) and take a visual look of how adolescent mortality rates varies with years among these three countries </strong>
+
+#### Philippines
+
+According to US National Library research, Philippines is one of the few countries in the world that have an increase in adolecent fertility rates.
+
+
+7) Filter data for Philippines by using filter() function of dplyr package. 
+
+8) Using ggplot(), plot the fertility rates vs years for Philippines
+
+
+```{r}
+Philippines <- tidy_gendered_world_indicators %>%
+  filter(Country == "Philippines")
+fertility_phi <- Philippines %>%
+  filter(Indicator == indicators[8])
+PHI_fertility <- ggplot(fertility_phi, aes(year, n))
+PHI_fertility + geom_jitter() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+Here we see, the fertility rate for Philippines was highest during 1960 and that rate has been decreasing constantly till 1997. Since then the rates has been increasing constantly till 2015.
+
+
+
+#### United States of America
+
+
+According to US National Library research, United States is one of the few countries in the world that have an increase in adolecent fertility rates.
+
+
+9) Filter data for United States by using filter() function of dplyr package. 
+
+10) Using ggplot(), plot the fertility rates vs years for United States
+
+
+```{r}
+United_States <- tidy_gendered_world_indicators %>%
+  filter(Country == "United States")
+fertility_usa <- United_States %>%
+  filter(Indicator == indicators[8])
+indicators <- unique(United_States$Indicator)
+USA_fertility <- ggplot(fertility_usa, aes(year, n))
+USA_fertility + geom_jitter() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+The United States of America's adolescent birth rate is generally decreasing, despite a slight uptick during the late 80's to early '90s.
+
+
+#### Switzerland
+
+
+According to US National Library research, Switzerland is one of the few countries in the world that have a decrease in adolecent fertility rates.
+
+
+11) Filter data for Switzerland by using filter() function of dplyr package. 
+
+12) Using ggplot(), plot the fertility rates vs years for Switzerland
+
+
+```{r}
+Switzerland <- tidy_gendered_world_indicators %>%
+  filter(Country == "Switzerland")
+fertility_Swi <- Switzerland %>%
+  filter(Indicator == indicators[8])
+SWI_fertility <- ggplot(fertility_Swi, aes(year, n))
+SWI_fertility + geom_jitter() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+Switzerland adolescent birth rate has a constant decreasing trend from 1967 onwards.
+
+So, here as we see, all three countries have varying rates of adolescent fertility. Therefore 
+
+#### Global Perspective Approach
+
+First, let's take a globalized approach to understanding adolescent birth rates. 
+
+The World Bank provides us with adolescent birth rate data going back to the 1960's, but also provides data for many other "Indicators". These Indicators often vary from country to country, but all countries also have these Indicators: Survival to age 65, female (% of cohort) and Survival to age 65, male (% of cohort). Let's use it to see a bigger picture about how mens and womens health care and how they affect young teenagers having kids. Is there any correlation?
+
+
+
+13) Create a new variable and plotting a density plot of pregnency rates of all the countries given in our tidy dataset.
+
+```{r}
+pregnancy <- tidy_gendered_world_indicators %>%
+  filter(Indicator == indicators[8])
+a <- ggplot(pregnancy, aes(n))
+a + geom_density()
+```
+
+
+<strong>In general, let's note that the data is skewed to the left. That means in our data set, going back to the 1960's, most countries have 0-150 births per thousand girls age 15-19. Very few have more than that. It is very likely that if we included data from the 1800's to 1900's this would look like a more normal distribution, because teenage births were quite common. Therefore, our data could be slightly biased.</strong>
+
+
+14) If we perform multiple linear regression on our Indicators Survival to age 65, female (% of cohort) and Survival to age 65, male (% of cohort) against Adolescent Pregnancy rates per 1000 teenagers from 15-19, we get the following
+
+
+```{r, include=FALSE}
+tidy_gendered_world_indicators %>% 
+  group_by(Indicator) %>%
+  summarise(N = n()) %>%
+  filter(N == 13440) 
+indicators <- unique(tidy_gendered_world_indicators$Indicator)
+fertility <- tidy_gendered_world_indicators %>%
+  filter(Indicator == indicators[8])
+survival_65_female <- tidy_gendered_world_indicators %>%
+  filter(Indicator == indicators[1])
+survival_65_male <- tidy_gendered_world_indicators %>%
+  filter(Indicator == indicators[2])
+```
+
+15) Perform regression analysis for the gendered world indicators we considered above
+
+
+```{r}
+fertility_survival <- summary(lm(fertility$n~ survival_65_female$n + survival_65_male$n))
+fertility_survival
+```
+
+
+Our equation is
+
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = \beta_0 + \beta_1(Percent \; survival \; to \; 64, \; male) + \beta_2(Percent \; survival \; to \; 64, female)$$
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = 236.65 + .90526(Percent \; survival \; to \; 64, \; male) - 3.1328 (Percent \; survival \; to \; 64, female)$$
+
+From this, we can already see that both percent survival variables are correlated to adolescent birth rates. In general, births per 1,000 women ages 15-19 are 236.65239 and increase by .905 births as the percent of males 64+ increases by 1% and decrease by 3.1328 births as the percent of females 64+ increases by 1%. We can see that an increase in care for women leads to less teenage births -- despite the massive age gap. This could be because of things like influences from maternal figures such as mothers, aunts, and grandmothers that are around and can nuture the young women in the family. Interestingly, percent of males increases births, although when done separately, both female and male percents decrease adolescent pregnancy.
+
+Note that the residuals are relatively normal and we have a large population size. 
+
+
+```{r}
+qqnorm(fertility_survival$residuals)
+qqline(fertility_survival$residuals)
+```
+
+
+Next, let's use these same Indicators and run multiple linear regression for our three countries in question: Philippines, United States, and Switzerland.
+
+##### Philippines 
+
+
+16) Density plot for Philippines fertility rate
+
+```{r}
+a <- ggplot(fertility_phi, aes(n))
+a + geom_density()
+```
+
+
+
+The Philippines has a similar density plot to the world, and actually doesn't have a very high maximum in comparison. It is still skewed to the left.
+
+
+```{r, include=FALSE}
+Philippines <- tidy_gendered_world_indicators %>%
+  filter(Country == "Philippines")
+#getting names of all potential indicators
+indicators <- unique(Philippines$Indicator)
+```
+
+```{r, include=FALSE}
+fertility_p <- Philippines %>%
+  filter(Indicator == indicators[8])
+indicators[1]
+male_65_percent_phi <- Philippines %>%
+  filter(Indicator == indicators[1])
+female_65_percent_phi <- Philippines %>%
+  filter(Indicator == indicators[2])
+```
+
+
+17) Perform regression analysis for the gendered world indicators we considered above
+
+
+```{r}
+fertility_survival_phi <- summary(lm(fertility_p$n~male_65_percent_phi$n + female_65_percent_phi$n))
+fertility_survival_phi
+```
+
+The model has an R2 of .82 and a p-value less than .05. The equation is
+
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = \beta_0 + \beta_1(Percent \; survival \; to \; 64, \; male) + \beta_2(Percent \; survival \; to \; 64, female)$$
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = -132.002 + 8.780(Percent \; survival \; to \; 64, \; male) - 4.544 (Percent \; survival \; to \; 64, female)$$
+
+Notice how much of an increase male survival impacts adolescent pregnancy. An article, published in August points us to a potential reason why. 
+
+> "The Philippines is struggling to manage its soaring teen pregnancy rates. The United Nations Population Fund (UNFPA) has found that teen pregnancies in the Philippines increased by 65% from 2000-2010. An estimated 24 babies are born to teen mothers every hour. Now, advocates and health workers are identifying a new trend: Teenage girls are not just getting pregnant, but doing so with much older men. They say it’s the need for financial security that drives girls into such relationships."
+https://www.globalcitizen.org/en/content/teen-pregnancy-older-men-philippines/
+
+This isn't a foreign concept to for many filipinos. Research says there are many filipino men who travel back to their homeland with promises of money or material goods for a night or ongoing relationship with an underage girl. Underage for American standards, that is. The age of consent back home is only 12 years old.
+
+On a more positive note, there is hope. Every percent of elder females decreases births per 1000 by 4. As mentioned before, perhaps an increase in care for women leads to less teenage births. This could be because of influences from matornly figures such as mothers, aunts, and grandmothers that are around and can nurture young women in the family. Family is incredibly important in the Philippines. If women can be role models or nurture their young daughters/sons to be careful, then we could potentially positively impact birth rates in the Philippines. 
+
+To view the relationship between the Indicators, we can observe trends in the graph below.
+
+```{r, include=FALSE}
+phi_health <- bind_rows(male_65_percent_phi, female_65_percent_phi, fertility_p)
+```
+
+```{r}
+f <- ggplot(data=phi_health, aes(year, n, group=Indicator))
+f + geom_line(aes(color=Indicator)) + theme(axis.text.x = element_blank() ) 
+```
+
+
+From this graph, it's clear that decrease in adolescent rates is proportional to increase in female and male survival rates.
+
+##### United States
+
+The United States follows a very normal distribution, as shown by the linear relationship shown earlier. In contrast to the World density plot, we have a normal distribution. 
+
+```{r}
+a <- ggplot(fertility_usa, aes(n))
+a + geom_density()
+```
+
+
+```{r, include=FALSE}
+United_States <- tidy_gendered_world_indicators %>%
+  filter(Country == "United States")
+fertility_u <- United_States %>%
+  filter(Indicator == indicators[8])
+male_65_percent_usa <- United_States %>%
+  filter(Indicator == indicators[1])
+female_65_percent_usa <- United_States %>%
+  filter(Indicator == indicators[2])
+```
+
+
+18) Perform regression analysis for the gendered world indicators we considered above
+
+```{r}
+fertility_survival_usa <- summary(lm(fertility_u$n~male_65_percent_usa$n + female_65_percent_usa$n))
+fertility_survival_usa
+```
+
+Here, our R2 is .82 and the p-value is less than .05. Our equation is
+
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = \beta_0 + \beta_1(Percent \; survival \; to \; 64, \; male) + \beta_2(Percent \; survival \; to \; 64, female)$$
+
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = 543.980 + 1.814(Percent \; survival \; to \; 64, \; male) - 7.410 (Percent \; survival \; to \; 64, female)$$
+
+
+Similar story as the Philippines is being shown here. 
+
+To view the relationship between the Indicators, we can observe trends in the graph below.
+
+```{r, include=FALSE}
+usa_health <- bind_rows(male_65_percent_usa, female_65_percent_usa, fertility_u)
+```
+
+```{r}
+f <- ggplot(data=usa_health, aes(year, n, group=Indicator))
+f + geom_line(aes(color=Indicator)) + theme(axis.text.x = element_blank() ) 
+```
+
+
+Similar to Philippines,In USA, rate of fertility decreases as the survival rates of male and female increases.
+
+##### Switzerland
+
+
+Switzerland's density chart is skewed to the left, likely because for a long period of time, adolescent birth rates were quite high, nearing the maximum for the world. Some factor is pushing them towards having less teenage pregnancies consistently from 1967 onwards. 
+
+```{r}
+a <- ggplot(fertility_Swi, aes(n))
+a + geom_density()
+```
+
+```{r, include=FALSE}
+Switzerland <- tidy_gendered_world_indicators %>%
+  filter(Country == "Switzerland")
+#isolating the variable we are concerned with, adolescent fertility
+fertility_Swi <- Switzerland %>%
+  filter(Indicator == indicators[8])
+indicators <- unique(Switzerland$Indicator)
+male_65_percent_Swi <- Switzerland %>%
+  filter(Indicator == indicators[1])
+female_65_percent_Swi <- Switzerland %>%
+  filter(Indicator == indicators[2])
+```
+
+19) Perform regression analysis for the gendered world indicators we considered above
+
+```{r}
+fertility_survival_Swi <- summary(lm(fertility_p$n~male_65_percent_Swi$n + female_65_percent_Swi$n))
+fertility_survival_Swi
+```
+
+Here, R2 is .86 and the p-value is less than .05. This may show us that there are alternative factors that *aren't* related to medial advances. We do however, see a similar trend with male and female survival rates -- although there is much less of a gendered distinction. Our equation is
+
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = \beta_0 + \beta_1(Percent \; survival \; to \; 64, \; male) + \beta_2(Percent \; survival \; to \; 64, female)$$
+
+$$ \widehat{\mathrm{births \; per \; 1,000 \; women \; ages \; 15-19}} = 348.2660  + 2.9366(Percent \; survival \; to \; 64, \; male) - 5.9310  (Percent \; survival \; to \; 64, female)$$
+
+```{r, include=FALSE}
+Swi_health <- bind_rows(male_65_percent_Swi, female_65_percent_Swi, fertility_Swi)
+```
+
+To view the relationship between the Indicators, we can observe trends in the graph below.
+
+```{r}
+f <- ggplot(data=Swi_health, aes(year, n, group=Indicator))
+f + geom_line(aes(color=Indicator)) + theme(axis.text.x = element_blank() ) 
+```
+
+
+As we see clearly, the survival age of females upto or more than 65 years of age has an inverse impact on the adolescent fertility rates. As the survival rate of females increases, the adolescent fertility rate in Swizerland, decreases drastically. 
+
+#### Backward Elimination Approach
+
+Since many of the indicators included (161 in total) don't have complete information, we will only analyze the ones with more than 25 values. In general, factors were broken down into three main categories as data permits: 
+
+1. Employment
+2. Education
+3. Health 
+
+##### Philippines
+
+The following factors are the values that we will be regressing against adolescent pregnancy rates for the Philippines. 
+
+```{r, include=FALSE}
+PHI_indicatiors_backwards <- tidy_gendered_world_indicators %>% 
+  group_by(Country, Indicator) %>%
+  summarise(N = n()) %>%
+  filter(N > 25) %>%
+  filter(Country == "Philippines") %>%
+  arrange(N)
+indicators_phi_backwards <- PHI_indicatiors_backwards$Indicator
+```
+
+```{r}
+indicators_phi_backwards[1:7]
+```
+
+<strong> Employment </strong>
+
+```{r, include=FALSE}
+Philippines <- tidy_gendered_world_indicators %>%
+  filter(Country == "Philippines")
+female_agriculture <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[14])
+male_agriculture <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[15])
+female_industry <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[16])
+male_industry <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[17])
+female_services <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[18])
+male_services <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[19])
+ind_years <- male_services$year
+fertility_phi_emp <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[20]) %>%
+  filter(year %in% ind_years)
+fertility_employment_phi <- summary(lm(fertility_phi_emp$n~ female_agriculture$n + male_agriculture$n + 
+                             female_industry$n + male_industry$n + female_services$n + male_services$n))
+```
+
+
+20) Perform regression analysis for the gendered world indicators we considered above
+
+
+```{r}
+fertility_employment_phi <- summary(lm(fertility_phi_emp$n~ female_agriculture$n + 
+                             female_industry$n + female_services$n))
+fertility_employment_phi
+```
+
+Even removing variables with the highest p-values, we do not have a very good model in terms of R2. I do not believe these employment metrics are a very useful to understand adolescent pregnancy in the Philippines. It is however better than looking at any one sector by itself, which yielded R2 values around .11.
+
+
+<strong> Education </strong>
+
+```{r, include=FALSE}
+female_primary_education_phi <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[10])
+gross_school_enrollment_phi <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[11])
+female_school_enrollment_phi <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[12])
+male_school_enrollment_phi <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[13])
+ind_years <- female_primary_education_phi$year
+fertility_phi_edu <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[20]) %>%
+  filter(year %in% ind_years)
+fertility_education_phi <- summary(lm(fertility_phi_edu$n~ female_primary_education_phi$n + gross_school_enrollment_phi$n + 
+                             female_school_enrollment_phi$n + male_school_enrollment_phi$n))
+fertility_education_phi
+```
+
+```{r}
+fertility_education_phi <- summary(lm(fertility_phi_edu$n ~ female_primary_education_phi$n + 
+                             female_school_enrollment_phi$n + male_school_enrollment_phi$n))
+fertility_education_phi
+```
+
+Since this model doesn't have a very high R2, let's run simple linear regression on the variable with the highest R2 and the most likely to affect teenage pregnancy -- female school enrollment.
+
+
+21) Perform regression analysis for the gendered world indicators we considered above
+
+```{r}
+fertility_education_phi <- summary(lm(fertility_phi_edu$n ~ female_school_enrollment_phi$n))
+fertility_education_phi
+```
+
+For a single variable, this has one of the highest correlations. What does it tell us? That when the risk of death increases, births decrease. A pretty obvious statement, but perhaps the reason we have such an uptick in adolescent birth rates is actually because of something we would deem GOOD in the Philippines -- access to health care is improving. The only issue? Access to birth control in this heavily orthodox country is heavily regulated and deemed morally wrong. 
+
+```{r, include=FALSE}
+schoolphi <- full_join(fertility_phi_edu, female_school_enrollment_phi, by="year")
+```
+
+```{r}
+ggplot(schoolphi, aes(x=n.x,y=n.y)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") + 
+  labs(x="Births per 1000 age 15-19",y="Female School Enrollment") 
+```
+
+I find this as a very interesting metric -- why is it that female enrollment does not decrease birth rates? Schools must not be teaching children ways of preventing pregnancy. In fact, the more females are in school, the higher birth rates are (slight correlation). They could be teaching the complete opposite, and Orthodox schools could be teaching children to be fearful of contraceptives. This is a common narative in the Documentary Motherland. Children were refusing free IUDs that would prevent pregnancy for up to 10 years -- out of fear. Schools need to teach that contraceptives are benefical. I also find it interesting that we can use statistics to understand relationships even when they aren't statistically significant -- like this one. 
+
+<strong> Health </strong>
+
+```{r, include=FALSE}
+risk_maternal_death <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[4])
+maternal_mortality_ratio <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[6])
+HIV_female_15to24 <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[7])
+HIV_male_15to24 <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[8])
+HIV_female_15up <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[9])
+ind_years <- HIV_female_15up$year
+fertility_phi_health <- Philippines %>%
+  filter(Indicator == indicators_phi_backwards[20]) %>%
+  filter(year %in% ind_years)
+```
+
+
+22) Perform regression analysis for the gendered world indicators we considered above
+
+
+```{r, include=FALSE}
+fertility_health_phi <- summary(lm(fertility_phi_health$n~ risk_maternal_death$n + maternal_mortality_ratio$n + 
+                             HIV_female_15to24$n + HIV_male_15to24$n + HIV_female_15up$n))
+fertility_health_phi
+```
+
+```{r}
+fertility_health_phi <- summary(lm(fertility_phi_health$n~ risk_maternal_death$n + maternal_mortality_ratio$n + 
+                             HIV_male_15to24$n))
+fertility_health_phi
+```
+
+
+
+```{r}
+plot(fertility_health_phi$residuals ~ fertility_phi_health$n)
+abline(h = 0, lty = 3)
+```
+
+
+Health is by far our best model for understanding adolescent birth rates in the philippines, with an adjusted R squared of .91. I think the most interesting metric, is that the risk of maternal death. Let's do simple regression on this indicator. 
+
+
+```{r}
+fertility_health_phi <- summary(lm(fertility_phi_health$n ~ risk_maternal_death$n))
+fertility_health_phi
+```
+
+For a single variable, this has one of the highest correlations. What does it tell us? That when the risk of death increases, births decrease. While its good that maternal death rates are decreasing during pregancies, it's not good that teenage girls are having more pregancies. Perhaps teenage pregnancies were always high -- but there are less birth related deaths now? Doesn't really account for the sudden uptick after rates were decreasing in the 70s.
+
+One thing to note, is that access to birth control isn't very good in the Philippines. In this heavily orthodox country, it is deemed morally wrong and absinence is the only good option. 
+
+
+
+```{r, include=FALSE}
+risk <- full_join(fertility_phi_health, risk_maternal_death, by="year")
+```
+
+
+
+```{r}
+ggplot(risk, aes(x=n.x,y=n.y)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") + 
+  labs(x="Births per 1000 age 15-19",y="Rate Maternal Death") 
+```
+
+
+With an increase in maternal death rate, rate of adolescent fertility decreases.
+
+
+```{r}
+autoplot(lm(n.y ~ n.x, data = risk), label.size = 3)
+```
+
+
+##### United States
+
+The following are factors we are using for understanding adolescent pregnancy in the United States. 
+
+```{r, include=FALSE}
+USA_indicatiors_backwards <- tidy_gendered_world_indicators %>% 
+  group_by(Country, Indicator) %>%
+  summarise(N = n()) %>%
+  filter(N >= 30) %>%
+  filter(Country == "United States") %>%
+  arrange(N)
+indicators_usa_backwards <- USA_indicatiors_backwards$Indicator
+indicators_usa_backwards
+```
+
+```{r}
+USA_indicatiors_backwards
+```
+
+<strong> Employment </strong>
+
+```{r, include=FALSE}
+USA <- tidy_gendered_world_indicators %>%
+  filter(Country == "United States")
+#These indicators have the least amount of data, need to shorten the others to accomidate 
+female_industry_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[10])
+male_industry_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[11])
+female_services_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[12])
+male_services_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[13])
+ind_years <- female_industry_usa$year
+percent_female_family_contributes_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[14]) %>%
+  filter(year %in% ind_years)
+percent_male_family_contributes_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[15]) %>%
+  filter(year %in% ind_years)
+female_self_emp_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[16]) %>%
+  filter(year %in% ind_years)
+male_self_emp_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[17]) %>%
+  filter(year %in% ind_years)
+female_vulnerable_employ_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[18]) %>%
+  filter(year %in% ind_years)
+male_vulnerable_employ_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[19]) %>%
+  filter(year %in% ind_years)
+percent_female_workers_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[20]) %>%
+  filter(year %in% ind_years)
+percent_male_workers_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[21]) %>%
+  filter(year %in% ind_years)
+female_agriculture_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[28]) %>%
+  filter(year %in% ind_years)
+male_agriculture_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[29]) %>%
+  filter(year %in% ind_years)
+fertility_usa_emp <- USA %>%
+  filter(Indicator == indicators_usa_backwards[27]) %>%
+  filter(year %in% ind_years)
+```
+
+23) Perform regression analysis for the gendered world indicators we considered above
+
+```{r, include=FALSE}
+fertility_employment_usa <- summary(lm(fertility_usa_emp$n~ female_industry_usa$n + male_industry_usa$n + 
+                             female_services_usa$n + male_services_usa$n + percent_female_family_contributes_usa$n + 
+                             percent_male_family_contributes_usa$n + female_self_emp_usa$n + male_self_emp_usa$n +
+                             female_vulnerable_employ_usa$n + male_vulnerable_employ_usa$n + percent_female_workers_usa$n +
+                             percent_male_workers_usa$n + female_agriculture_usa$n + male_agriculture_usa$n))
+fertility_employment_usa
+```
+
+```{r}
+fertility_employment_usa <- summary(lm(fertility_usa_emp$n~ male_industry_usa$n + 
+                             male_services_usa$n + percent_female_family_contributes_usa$n + 
+                             male_self_emp_usa$n + male_agriculture_usa$n))
+fertility_employment_usa
+```
+
+
+For The United States of America, it appears as though Employment actually plays a very big role in family planning, a narative that has been said for many years as women are accepted more and more into the workplace. In fact, the most important variable here is percent_female_workers_usa, and generates a statistically significant model using simple linear regression.
+
+
+
+```{r}
+fertility_employment_usa <- summary(lm(fertility_usa_emp$n ~ percent_female_workers_usa$n  ))
+fertility_employment_usa
+```
+
+As one can see from the graph below, the more females in the workplace, the less adolescent births within the United States of America.
+
+```{r, include=FALSE}
+usawork <- full_join(fertility_usa_emp, percent_female_workers_usa, by="year")
+```
+
+```{r}
+ggplot(usawork, aes(x=n.x,y=n.y)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") + 
+  labs(x="Births per 1000 age 15-19",y="Percent Female Workers in USA") 
+```
+
+Residuals appear nearly normal. As the percent of female workers increase in USA, adolescent fertility rate decreases.
+
+```{r}
+autoplot(lm(n.y ~ n.x, data = usawork), label.size = 3)
+```
+
+<strong> Education </strong>
+
+```{r, include=FALSE}
+female_primary_edu_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[1])
+gross_school_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[2])
+female_primary_school_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[3])
+male_primary_school_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[4])
+gross_secondary_school_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[5])
+female_secondary_school_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[6])
+male_secondary_school_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[7])
+female_secondary_education_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[8])
+ind_years <- female_secondary_education_usa$year
+gross_tertiary_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[22]) %>%
+  filter(year %in% ind_years)
+female_tertiary_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[23]) %>%
+  filter(year %in% ind_years)
+male_tertiary_enrollment_usa <- USA %>%
+  filter(Indicator == indicators_usa_backwards[24]) %>%
+  filter(year %in% ind_years)
+fertility_usa_edu <- USA %>%
+  filter(Indicator == indicators_usa_backwards[27]) %>%
+  filter(year %in% ind_years)
+```
+
+
+24) Perform regression analysis for the gendered world indicators we considered above
+
+```{r, include=FALSE}
+fertility_education_usa <- summary(lm(fertility_usa_edu$n~ female_primary_edu_usa$n + gross_school_enrollment_usa$n + 
+                             female_primary_school_enrollment_usa$n + male_primary_school_enrollment_usa$n + gross_secondary_school_enrollment_usa$n +  female_secondary_school_enrollment_usa$n + male_secondary_school_enrollment_usa$n + female_secondary_education_usa$n +
+                             gross_tertiary_enrollment_usa$n + female_tertiary_enrollment_usa$n + male_tertiary_enrollment_usa$n))
+fertility_education_usa
+```
+
+
+```{r}
+fertility_education_phi <- summary(lm(fertility_usa_edu$n~ female_primary_edu_usa$n + gross_school_enrollment_usa$n + 
+                             female_primary_school_enrollment_usa$n + male_primary_school_enrollment_usa$n + gross_secondary_school_enrollment_usa$n +
+                             male_secondary_school_enrollment_usa$n + female_secondary_education_usa$n +
+                             gross_tertiary_enrollment_usa$n + female_tertiary_enrollment_usa$n + male_tertiary_enrollment_usa$n))
+fertility_education_phi
+```
+
+I think we can see that there is a big difference in how education and employment affects adolescent birth rates in USA. Nearly every value is statistically significant in our model.
+
+Female tertiary enrollment (high school) was a very important variable. I'm sure if college level education was included, that would be the most successful.
+
+```{r}
+fertility_education_usa <- summary(lm(fertility_usa_edu$n ~   female_tertiary_enrollment_usa$n ))
+fertility_education_usa
+```
+
+```{r, include=FALSE}
+usaedu <- full_join(fertility_usa_edu, female_tertiary_enrollment_usa, by="year")
+```
+
+```{r}
+ggplot(usaedu, aes(x=n.x,y=n.y)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") + 
+  labs(x="Births per 1000 age 15-19",y="Females Enrolled in High School") 
+```
+
+Residuals appear nearly normal. With an increase rate of females enrolled in High school, Adolescent fertility rate decreases.
+
+```{r}
+autoplot(lm(n.y ~ n.x, data = usaedu), label.size = 3)
+```
+
+
+##### Switzerland
+
+The following factors are the values that we will be regressing against adolescent pregnancy rates for Switzerland
+
+```{r, include=FALSE}
+Switzerland_indicatiors_backwards <- tidy_gendered_world_indicators %>% 
+  group_by(Country, Indicator) %>%
+  summarise(N = n()) %>%
+  filter(N >= 25) %>%
+  filter(Country == "Switzerland") %>%
+  arrange(N)
+indicators_Switzerland_backwards <- Switzerland_indicatiors_backwards$Indicator
+```
+
+```{r}
+Switzerland_indicatiors_backwards
+```
+
+<strong> Employment </strong>
+
+```{r, include=FALSE}
+Switzerland <- tidy_gendered_world_indicators %>%
+  filter(Country == "Switzerland")
+#These indicators have the least amount of data, need to shorten the others to accomidate 
+female_family_workers_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[1])
+ind_years <- female_family_workers_Swi$year
+male_family_workers_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[2])
+female_employers_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[3])
+male_employers_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[4])
+female_employed_ratio_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[5])
+male_employed_ratio_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[6])
+unemployed_female_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[11])
+unemployed_male_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[12])
+
+fertility_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[57]) %>%
+  filter(year %in% ind_years)
+
+```
+
+
+25) Perform regression analysis for the gendered world indicators we considered above
+
+
+```{r, include=FALSE}
+fertility_employment_Swi <- summary(lm(fertility_Swi$n~ female_family_workers_Swi$n + male_family_workers_Swi$n + 
+                             female_employers_Swi$n + male_employers_Swi$n + female_employed_ratio_Swi$n + 
+                             male_employed_ratio_Swi$n + unemployed_female_Swi$n + unemployed_male_Swi$n ))
+fertility_employment_Swi
+```
+
+```{r}
+fertility_employment_Swi <- summary(lm(fertility_Swi$n~ female_family_workers_Swi$n + male_family_workers_Swi$n))
+fertility_employment_Swi
+```
+
+Employmeny also seems to be a big factor that dictates adolescent pregnancy. 
+
+Let's take one variable for analysis. Female family workers in Switzerland appear to be an important factor for decreasing adolescent pregnancy rates, with an R2 of .7793
+
+```{r}
+fertility_employment_Swi <- summary(lm(fertility_Swi$n~ female_family_workers_Swi$n ))
+fertility_employment_Swi
+```
+
+```{r, include=FALSE}
+laborSwi <- full_join(fertility_Swi, female_family_workers_Swi, by="year")
+```
+
+This appears to follow a logrithmic function, but interestingly, we have an inverse relationship between female family workers and adolescent pregnancy. While in America, females being included in the workplace decreased rates of pregnancy, Switzerland seems to follow same concept. 
+
+```{r}
+ggplot(laborSwi, aes(x=n.x,y=n.y)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") + 
+  labs(x="Births per 1000 age 15-19",y="Females Family workers") 
+```
+
+Residuals appear nearly normal. Threfore, with decrease in rate of female family workers, adolescent fertility rate increases drastically.
+
+```{r}
+autoplot(lm(n.y ~ n.x, data = laborSwi), label.size = 3)
+```
+
+
+26) Perform regression analysis for the gendered world indicators we considered above
+
+```{r}
+fertility_employment_Swi <- summary(lm(fertility_Swi$n~ male_family_workers_Swi$n))
+fertility_employment_Swi
+```
+
+```{r, include=FALSE}
+laborSwim <- full_join(fertility_Swi, male_family_workers_Swi, by="year")
+```
+
+
+```{r}
+ggplot(laborSwim, aes(x=n.x,y=n.y)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") + 
+  labs(x="Births per 1000 age 15-19",y="Males Labor Force") 
+```
+
+
+Also, with decrease in rate of male labour force, adolescent fertility rate decreases.
+
+
+
+<strong> Health </strong>
+
+```{r, include=FALSE}
+
+
+survival_65_female_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[61])
+ind_years <-survival_65_female_Swi$year
+survival_65_male_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[62])
+ind_years <-survival_65_male_Swi$year
+
+fertility_Swi <- Switzerland %>%
+  filter(Indicator == indicators_Switzerland_backwards[57]) %>%
+  filter(year %in% ind_years)
+
+```
+
+
+27) Perform regression analysis for the gendered world indicators we considered above
+
+```{r}
+fertility_health_Swi <- summary(lm(fertility_Swi$n ~ survival_65_female_Swi $n+ survival_65_male_Swi$n))
+fertility_health_Swi
+```
+
+
+Health is also correlated with adolescent pregnancy. Let's dive deeper to find out how by looking at just one of these variables.
+
+```{r}
+fertility_health_Swi <- summary(lm(fertility_Swi$n~ survival_65_female_Swi $n ))
+fertility_health_Swi
+```
+
+
+
+```{r}
+fertility_health_Swi <- summary(lm(fertility_Swi$n~ survival_65_male_Swi$n ))
+fertility_health_Swi
+```
+
+
+
+
+Just like in the Philippines, the risk of maternal death is highly correlated with adolescent pregnancy, however the higher the risk the higher the pregnancy. It is likely then that female health is improving in Swizerland in general and that females are more likely to use contraception than in the Philippines. 
+
+
+
+```{r, include=FALSE}
+healthSwim <- full_join(fertility_Swi, survival_65_female_Swi, by="year")
+```
+
+```{r}
+ggplot(healthSwim, aes(x=n.x,y=n.y)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") + 
+  labs(x="Births per 1000 age 15-19",y="Female Survival upto 65 years") 
+```
+
+
+```{r}
+autoplot(lm(n.y ~ n.x, data = healthSwim), label.size = 3)
+```
+
+
+
+### Inference
+
+
+Let's conduct hypothesis tests for the three countries we analyzed(Philippines, United States, Switzerland) taking the adolescent fertility rates as response variable and various world indicators as exploratory variable.
+
+#### Check conditions
+
+1. The random condition
+
+Sample means are unbiased estimators of their population mean. Therefore, the random condition is satisfied.
+
+2. The normal condition
+
+There is approximate normality in the sampling distribution when sample size is greater than or equal to, 30. Also, If the parent population is normally distributed, then the sampling distribution of is approximately normal regardless of sample size.
+
+3. The independence condition
+
+The 10% condition says that if we sample 10% or less of the population, we can treat individual observations as independent since removing each observation doesn't change the population all that much as we sample. For instance, if our sample size is 
+n = 30 there should to be at least N=300 members in the population for the sample to meet the independence condition.
+
+Therefore our sample data satisfies the 10% condition and hence it fulfills the independence condition.
+
+
+#### Philippines
+
+<strong> Confidence Interval </strong>
+
+<strong> ANOVA Analysis</strong> 
+
+We will conduct an ANOVA analysis to test the confidence interval, to know the 95% confidence level and difference between the mean rate of adolescent fertility through 1960 to 2015.
+
+```{r}
+
+Philippines <- tidy_gendered_world_indicators %>%
+  filter(Country == "Philippines")
+#getting names of all potential indicators
+indicators <- unique(Philippines$Indicator)
+```
+
+
+```{r}
+phi.aov<-aov(Philippines$n~Philippines$year )
+```
+
+```{r}
+attributes(phi.aov)
+
+summary(phi.aov)
+```
+
+
+Conduct a Tukey's multiple comparison procedure
+
+<details>
+  <summary> *Tukey's multiple comparison* </summary>
+
+```{r}
+TukeyHSD(phi.aov,console=TRUE)
+```
+
+</details>
+
+
+<strong> Hypothesis Test </strong>
+
+
+```{r include=FALSE}
+source("http://stat.duke.edu/courses/Fall12/sta101.001/labs/inference.R")
+```
+
+
+
+H0 = The mean of all the world indicators that effect the adolescent fertility rates are equal throughout from 1960 to 2015.
+
+H1 = The mean of all the world indicators that effect the adolescent fertility rates are not equal throughout from 1960 to 2015.
+
+<details>
+  <summary> *Inference* </summary>
+
+
+```{r}
+inference(data = Philippines$n, group = Philippines$year, est = "mean", type = "ht",  alternative = "greater", method = "theoretical")
+
+```
+
+</details>
+
+
+
+As we can see, p-value is greater than 0.05.
+
+Therefore, we fail to reject the null hypothesis and conclude that <strong> The mean of all the world indicators that effect the adolescent fertility rates are almost equal throughout from 1960 to 2015. </strong>. It does not necessarily vary for each of the world indicators.
+
+
+
+#### United States
+
+<strong> Confidence Interval </strong>
+
+<strong> ANOVA Analysis</strong> 
+
+We will conduct an ANOVA analysis to test the confidence interval, to know the 95% confidence level and difference between the mean rate of adolescent fertility through 1960 to 2015.
+
+```{r}
+
+UnitedStates <- tidy_gendered_world_indicators %>%
+  filter(Country == "United States")
+#getting names of all potential indicators
+indicators <- unique(UnitedStates$Indicator)
+```
+
+```{r}
+us.aov<-aov(UnitedStates$n~UnitedStates$year )
+```
+
+```{r}
+attributes(us.aov)
+
+summary(us.aov)
+```
+
+Conduct a Tukey's multiple comparison procedure
+
+<details>
+  <summary> *Tukey's multiple comparison* </summary>
+
+```{r}
+TukeyHSD(us.aov,console=TRUE)
+```
+
+</details>
+
+
+<strong> Hypothesis Test </strong>
+
+
+```{r}
+US <- subset(UnitedStates)
+```
+
+
+
+H0 = The mean of all the world indicators that effect the adolescent fertility rates are equal throughout from 1960 to 2015.
+
+H1 = The mean of all the world indicators that effect the adolescent fertility rates are not equal throughout from 1960 to 2015.
+
+
+<details>
+  <summary> *Inference* </summary>
+
+```{r}
+inference(data = US$n, group = US$year, est = "mean", type = "ht",  alternative = "greater", method = "theoretical")
+
+```
+
+</details>
+
+
+As we can see, p-value is greater than 0.05.
+
+Therefore, we fail to reject the null hypothesis and conclude that <strong> The mean of all the world indicators that effect the adolescent fertility rates are almost equal throughout from 1960 to 2015. </strong>. It does not necessarily vary for each of the world indicators.
+
+
+
+
+#### Switzerland
+
+<strong> Confidence Interval </strong>
+
+<strong> ANOVA Analysis</strong> 
+
+We will conduct an ANOVA analysis to test the confidence interval, to know the 95% confidence level and difference between the mean rate of adolescent fertility through 1960 to 2015.
+
+```{r}
+
+Switzerland <- tidy_gendered_world_indicators %>%
+  filter(Country == "Switzerland")
+#getting names of all potential indicators
+indicators <- unique(Switzerland$Indicator)
+```
+
+
+```{r}
+swi.aov<-aov(Switzerland$n~Switzerland$year )
+```
+
+```{r}
+attributes(swi.aov)
+
+summary(swi.aov)
+```
+
+Conduct a Tukey's multiple comparison procedure
+
+<details>
+  <summary> *Tukey's multiple comparison* </summary>
+
+```{r}
+TukeyHSD(swi.aov,console=TRUE)
+```
+
+</details>
+
+
+<strong> Hypothesis Test </strong>
+
+
+```{r}
+SWI <- subset(Switzerland)
+```
+
+
+
+
+H0 = The mean of all the world indicators that effect the adolescent fertility rates are equal throughout from 1960 to 2015.
+
+H1 = The mean of all the world indicators that effect the adolescent fertility rates are not equal throughout from 1960 to 2015.
+
+<details>
+  <summary> *Inference* </summary>
+
+```{r}
+inference(data = SWI$n, group = SWI$year, est = "mean", type = "ht",  alternative = "greater", method = "theoretical")
+
+```
+
+</details>
+
+
+As we can see, p-value is less than 0.05. 
+
+Therefore, we reject the null hypothesis and conclude that <strong> The mean of all the world indicators that effect the adolescent fertility rates are not equal throughout from 1960 to 2015. </strong>. It varies for each of the world indicators.
+
+<strong>Inference Results</strong>
+
+1) Therefore, as we saw inference results for Philippines and United States ,we failed to reject the null hypothesis, which further proves that adolescent fertility rates of these countries is not much improved or affected by world indicators. Their adolescent fertility rates are more impacted by the socio-economic factors.
+
+
+2) And also, as we saw inference results for Switzerland  ,we reject the null hypothesis, which further proves that adolescent fertility rates of these countries is much improved or affected by world indicators. Their adolescent fertility rates are also impacted by the scocio-economic factors which overall results in constant decreasing feritlity rates in Switzerland.
+
+###  Conclusion
+
+It is often citied that the decrease in pregnancy overall is due to things like access to contraceptives and sex-education programs. In this study, various World Bank indicators were regressed against adolescent preganancy rates within Philippines, United States, and Switzerland. 
+
+<strong> Philippines </strong>
+
+In the Philippines, rates are increasing (one of the few countries) despite lower risks of maternal death, and increasing survival rates (alluding to better healthcare overall). The country should allow for the use of contraceptives and sex-education programs. There is something to be said that the country has good education rates and increased teenage pregnancies. Their other metrics are ok -- there is something holding them back, and that's a flawed outlook on pregnancy. 
+
+
+<strong> United States </strong>
+
+For the countries with complete statistics, there is an inverse correlation between the pregnancy rate and the proportion of pregnancies ending in abortion. In countries with high teen pregnancy rates, a smaller proportion of those pregnancies ended in abortion. As a result, the spread in birth rates is even greater than the already large spread in pregnancy rates. For example, the U.S. teen pregnancy rate is about seven times that of Switzerland, but the U.S. birth rate is 15 times that of Switzerland.
+
+<strong> Switzerland </strong>
+
+Switzerland, on the other hand is attempting to improve, and in doing so more rapidly than their metrics would allude to. There is likely some form out outside influence going on. Of the 3 countries with complete estimates of young adolescent pregnancy rates, the lowest was in Switzerland. 
+
+Now let's see the factors which these countries adopts which leads to different levels of adolescent fertility rates and answer the research questions we formulated at the beginning of this project.
+
+<strong> 1) Which countries have the most significant increasing/decreasing adolescent fertility rates. </strong>
+
+Out of the three countries we analyzed, Philippines's  adolescent fertility rate is most significantly increasing followed by United States.
+
+Swizerland's adolescent fertility rates are most significantly decreasing out of all the countries.
+
+<strong> 2) Determine potential reasons for what in particular makes countries with decreasing or consistent fertility rates different from countries with higher or increasing fertility rates? </strong>
+
+Factors leading to increasing pregnency rates:
+
+1) Studies have more frequently examined the relationship among social, economic, and cultural factors and differences in teen pregnancy rates within countries. In the United Kingdom and the United States, for example, teen pregnancy rates are higher in the most socioeconomically disadvantaged groups. 
+
+2) In the United States, the pregnancy rate is 100 among black teenagers and 38 among white teens (a rate that is still high for a developed country),9 although this differential has decreased with time .
+
+3) Qualitative research in the United Kingdom points to poor material circumstances, unhappiness at home or at school, and low expectations for the future as factors associated with high teen pregnancy rates.
+
+Therefore, as we saw inference results for Philippines and United States ,we failed to reject the null hypothesis, which further proves that adolescent fertility rates of these countries is not much improved or affected by world indicators. Their adolescent fertility rates are more impacted by the scocio-economic factors.
+
+Factors leading to decreasing pregnency rates:
+
+1) At the other end of the spectrum, the very low teen pregnancy rate in Switzerland exists in the context of long-established sex education programs, widespread expectation that sexually active teens will use contraception, free family planning services and low-cost emergency contraception. 
+
+2) But even in Switzerland, statistics indicate that teen pregnancy rates vary with levels of education and cultural background of adolescent girls.
+
+Therefore, as we saw inference results for Switzerland  ,we reject the null hypothesis, which further proves that adolescent fertility rates of these countries is much improved or affected by world indicators. Their adolescent fertility rates are also impacted by the scocio-economic factors which overall results in constant decreasing feritlity rates in Switzerland.
+
+
+Additional research would help us better understand circumstances that can lead to teen pregnancies and how these circumstances can be influenced. Examination of the factors that influence whether an adolescent who gets pregnant will seek an abortion or have a child can also inform how adolescents can be supported in the face of a pregnancy.
+
+
+Moreover, further research to help disentangle the factors that are causally associated with unplanned teen pregnancies from the factors that are simply correlated with such pregnancies can inform interventions aimed at helping adolescent girls avoid unintended pregnancy and instead take advantage of other opportunities before them.
+
+
+### References
+
+1) [World Health Organization on adolescent         pregnency](https://www.who.int/news-room/fact-sheets/detail/adolescent-pregnancy)
+
+2) [Socio Economic Factors in teenage pregnency rates](https://www.guttmacher.org/journals/psrh/2001/11/differences-teenage-pregnancy-rates-among-five-developed-countries-roles)
+
+3) [Adolescent Pregnancy, Birth, and Abortion Rates Across Countries: Levels and Recent Trends](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4852976/)
